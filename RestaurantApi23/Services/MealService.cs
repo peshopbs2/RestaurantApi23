@@ -1,4 +1,6 @@
 ﻿using RestaurantApi23.Data.Entities;
+using RestaurantApi23.Models.Meal.Response;
+using RestaurantApi23.Models.Restaurant.Responses;
 using RestaurantApi23.Repositories.Abstractions;
 using RestaurantApi23.Services.Abstractions;
 using System.Net;
@@ -15,7 +17,7 @@ namespace RestaurantApi23.Services
             _mealRepository = mealRepository;
         }
 
-        public async Task<Meal> CreateMeal(string title, string description, string pictureUrl, int restaurantId)
+        public async Task<MealResponseDto> CreateMeal(string title, string description, string pictureUrl, int restaurantId)
         {
             var item = await _mealRepository.CreateOrUpdate(new Meal()
             {
@@ -25,17 +27,59 @@ namespace RestaurantApi23.Services
                 RestaurantId = restaurantId
             });
 
-            return item;
+            return new MealResponseDto()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Description = item.Description,
+                PictureUrl = item.PictureUrl,
+                Restaurant = new RestaurantPairResponseDto()
+                {
+                    RestaurantId = item.Restaurant.Id,
+                    RestaurantName = item.Restaurant.Name
+                },
+                CreatedAt = item.CreatedAt,
+                ModifiedAt = item.ModifiedAt
+            };
         }
 
-        public IEnumerable<Meal> GetAll()
+        public IEnumerable<MealResponseDto> GetAll()
         {
-            return _mealRepository.GetAll();
+            return _mealRepository.GetAll()
+                .Select(item => new MealResponseDto()
+                {
+                    Id = item.Id,
+                    Title = item.Title,
+                    Description = item.Description,
+                    PictureUrl = item.PictureUrl,
+                    Restaurant = new RestaurantPairResponseDto()
+                    {
+                        RestaurantId = item.Restaurant.Id,
+                        RestaurantName = item.Restaurant.Name
+                    },
+                    CreatedAt = item.CreatedAt,
+                    ModifiedAt = item.ModifiedAt
+                })
+                .ToList();
         }
 
-        public async Task<Meal> GetById(int id)
+        public async Task<MealResponseDto> GetById(int id)
         {
-            return await _mealRepository.GetById(id);
+            var item = await _mealRepository.GetById(id);
+            return new MealResponseDto()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Description = item.Description,
+                PictureUrl = item.PictureUrl,
+                Restaurant = new RestaurantPairResponseDto()
+                {
+                    RestaurantId = item.Restaurant.Id,
+                    RestaurantName = item.Restaurant.Name
+                },
+                CreatedAt = item.CreatedAt,
+                ModifiedAt = item.ModifiedAt
+            };
         }
 
         public async Task<bool> RemoveMeal(int id)
@@ -43,7 +87,7 @@ namespace RestaurantApi23.Services
             return await _mealRepository.RemoveById(id);
         }
 
-        public async Task<Meal> UpdateMeal(int id, string title, string description, string pictureUrl, int restaurantId)
+        public async Task<MealResponseDto> UpdateMeal(int id, string title, string description, string pictureUrl, int restaurantId)
         {
             var item = await _mealRepository.GetById(id);
             if (item != null)
@@ -54,7 +98,21 @@ namespace RestaurantApi23.Services
                 item.PictureUrl = pictureUrl;
                 item.RestaurantId = restaurantId;
 
-                return await _mealRepository.CreateOrUpdate(item);
+                item = await _mealRepository.CreateOrUpdate(item);
+                return new MealResponseDto()
+                {
+                    Id = item.Id,
+                    Title = item.Title,
+                    Description = item.Description,
+                    PictureUrl = item.PictureUrl,
+                    Restaurant = new RestaurantPairResponseDto()
+                    {
+                        RestaurantId = item.Restaurant.Id,
+                        RestaurantName = item.Restaurant.Name
+                    },
+                    CreatedAt = item.CreatedAt,
+                    ModifiedAt = item.ModifiedAt
+                };
             }
             else
             {

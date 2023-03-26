@@ -56,9 +56,21 @@ namespace RestaurantApi23
                 };
             });
 
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                    });
+            });
             builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddTransient<IRestaurantService, RestaurantService>();
             builder.Services.AddTransient<IMealService, MealService>();
+            builder.Services.AddTransient<IReviewService, ReviewService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -102,8 +114,9 @@ namespace RestaurantApi23
 
             app.UseHttpsRedirection();
 
+            app.UseCors(MyAllowSpecificOrigins);
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

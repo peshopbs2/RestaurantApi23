@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using RestaurantApi23.Data;
 using RestaurantApi23.Data.Entities;
+using RestaurantApi23.Models.Meal.Request;
+using RestaurantApi23.Models.Meal.Response;
 using RestaurantApi23.Services.Abstractions;
 
 namespace RestaurantApi23.Controllers
@@ -24,14 +28,14 @@ namespace RestaurantApi23.Controllers
 
         // GET: api/Meals
         [HttpGet]
-        public IEnumerable<Meal> GetMeals()
+        public IEnumerable<MealResponseDto> GetMeals()
         {
             return _mealService.GetAll();
         }
 
         // GET: api/Meals/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Meal>> GetMeal(int id)
+        public async Task<ActionResult<MealResponseDto>> GetMeal(int id)
         {
             var meal = await _mealService.GetById(id);
 
@@ -45,8 +49,9 @@ namespace RestaurantApi23.Controllers
 
         // PUT: api/Meals/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMeal(int id, Meal meal)
+        public async Task<IActionResult> PutMeal(int id, MealRequestDto meal)
         {
             await _mealService.UpdateMeal(id, meal.Title, meal.Description, meal.PictureUrl, meal.RestaurantId);
             return NoContent();
@@ -55,11 +60,11 @@ namespace RestaurantApi23.Controllers
         // POST: api/Meals
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Meal>> PostMeal(Meal meal)
+        public async Task<ActionResult<MealResponseDto>> PostMeal(MealRequestDto meal)
         {
-            meal = await _mealService.CreateMeal(meal.Title, meal.Description, meal.PictureUrl, meal.RestaurantId);
+            var result = await _mealService.CreateMeal(meal.Title, meal.Description, meal.PictureUrl, meal.RestaurantId);
 
-            return CreatedAtAction("GetMeal", new { id = meal.Id }, meal);
+            return CreatedAtAction("GetMeal", new { id = result.Id }, result);
         }
 
         // DELETE: api/Meals/5

@@ -1,4 +1,5 @@
 ﻿using RestaurantApi23.Data.Entities;
+using RestaurantApi23.Models.Restaurant.Responses;
 using RestaurantApi23.Repositories.Abstractions;
 using RestaurantApi23.Services.Abstractions;
 
@@ -12,7 +13,7 @@ namespace RestaurantApi23.Services
             _restaurantRepository= restaurantRepository;
         }
 
-        public async Task<Restaurant> CreateRestaurant(string name, string description, string address)
+        public async Task<RestaurantResponseDto> CreateRestaurant(string name, string description, string address)
         {
             var item = await _restaurantRepository.CreateOrUpdate(new Restaurant()
             {
@@ -21,7 +22,16 @@ namespace RestaurantApi23.Services
                 Address = address
             });
 
-            return item;
+            //TODO: upgrade to automapper
+            return new RestaurantResponseDto()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                Address = item.Address,
+                CreatedAt = item.CreatedAt,
+                ModifiedAt = item.ModifiedAt
+            };
         }
 
         public async Task<bool> RemoveRestaurant(int id)
@@ -29,17 +39,35 @@ namespace RestaurantApi23.Services
             return await _restaurantRepository.RemoveById(id);
         }
 
-        public IEnumerable<Restaurant> GetAll()
+        public IEnumerable<RestaurantResponseDto> GetAll()
         {
-            return _restaurantRepository.GetAll();
+            return _restaurantRepository.GetAll()
+                .Select(item => new RestaurantResponseDto()
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    Address = item.Address,
+                    CreatedAt = item.CreatedAt,
+                    ModifiedAt = item.ModifiedAt
+                });
         }
 
-        public async Task<Restaurant> GetById(int id)
+        public async Task<RestaurantResponseDto> GetById(int id)
         {
-            return await _restaurantRepository.GetById(id);
+            var item = await _restaurantRepository.GetById(id);
+            return new RestaurantResponseDto()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                Address = item.Address,
+                CreatedAt = item.CreatedAt,
+                ModifiedAt = item.ModifiedAt
+            };
         }
 
-        public async Task<Restaurant> UpdateRestaurant(int id, string name, string description, string address)
+        public async Task<RestaurantResponseDto> UpdateRestaurant(int id, string name, string description, string address)
         {
             var item = await _restaurantRepository.GetById(id);
             if (item != null)
@@ -49,7 +77,17 @@ namespace RestaurantApi23.Services
                 item.Description = description;
                 item.Address = address;
 
-                return await _restaurantRepository.CreateOrUpdate(item);
+                item = await _restaurantRepository.CreateOrUpdate(item);
+
+                return new RestaurantResponseDto()
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    Address = item.Address,
+                    CreatedAt = item.CreatedAt,
+                    ModifiedAt = item.ModifiedAt
+                };
             }
             else
             {
