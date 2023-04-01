@@ -10,13 +10,17 @@ import { AuthHttpInterceptor } from './interceptors/auth.interceptor';
 import { AuthService } from './services/auth.service';
 import { ListComponent } from './components/restaurant/list/list.component';
 import { AddComponent } from './components/restaurant/add/add.component';
+import { EditComponent } from './components/restaurant/edit/edit.component';
+import { DeleteComponent } from './components/restaurant/delete/delete.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     ListComponent,
-    AddComponent
+    AddComponent,
+    EditComponent,
+    DeleteComponent
   ],
   imports: [
     BrowserModule,

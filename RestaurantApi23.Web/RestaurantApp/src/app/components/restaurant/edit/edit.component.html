@@ -1,0 +1,20 @@
+<h2>Edit Restaurant</h2>
+<form [formGroup]="formRestaurant" (ngSubmit)="save()">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" formControlName="name">
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea formControlName="description">
+        </textarea>
+    </div>
+    <div class="form-group">
+        <label for="address">Address</label>
+        <textarea formControlName="address">
+        </textarea>
+    </div>
+    <div class="form-group">
+        <button type="submit">Save</button>
+    </div>
+</form>

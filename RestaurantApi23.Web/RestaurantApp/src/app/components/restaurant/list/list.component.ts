@@ -31,4 +31,7 @@ export class ListComponent implements OnInit {
     this.currentRestaurant = {};
     this.currentIndex = -1;
   }
+  editRestaurant(id : Number) {
+    
+  }
 }
